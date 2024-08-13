@@ -41,7 +41,7 @@
     <div class="weather-dashboard">
         <div id="time" class="time">00:00</div>
         <div id="city" class="city-name">CITY NAME</div>
-        <div id="weather" class="weather-info">{TEMP} - {CONDITION}</div>
+        <div id="weather" class="weather-info">LOADING...</div>
     </div>
 
     <script>
@@ -54,7 +54,21 @@
 
         function updateCityAndWeather(city, temp, condition) {
             document.getElementById('city').textContent = city;
-            document.getElementById('weather').textContent = `${temp} - ${condition}`;
+            document.getElementById('weather').textContent = `${temp}°C - ${condition}`;
+        }
+
+        function fetchWeather(lat, lon, city) {
+            fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`)
+                .then(response => response.json())
+                .then(data => {
+                    const temp = data.current_weather.temperature;
+                    const condition = data.current_weather.weathercode;
+                    updateCityAndWeather(city, temp, condition);
+                })
+                .catch(error => {
+                    console.error('Error fetching weather data:', error);
+                    document.getElementById('weather').textContent = "Unable to load weather data";
+                });
         }
 
         function fetchCityFromCoordinates(lat, lon) {
@@ -62,13 +76,11 @@
                 .then(response => response.json())
                 .then(data => {
                     const city = data.city || "Unknown City";
-                    const temp = "XX°C";
-                    const condition = "Unknown";
-                    updateCityAndWeather(city, temp, condition);
+                    fetchWeather(lat, lon, city);
                 })
                 .catch(error => {
                     console.error('Error fetching city from coordinates:', error);
-                    fetchCityFromIP();
+                    document.getElementById('weather').textContent = "Unable to determine city";
                 });
         }
 
@@ -81,12 +93,13 @@
                 .then(response => response.json())
                 .then(data => {
                     const city = data.city || "Unknown City";
-                    const temp = "XX°C"; 
-                    const condition = "Unknown";
-                    updateCityAndWeather(city, temp, condition);
+                    const lat = parseFloat(data.loc.split(',')[0]);
+                    const lon = parseFloat(data.loc.split(',')[1]);
+                    fetchWeather(lat, lon, city);
                 })
                 .catch(error => {
                     console.error('Error fetching city from IP:', error);
+                    document.getElementById('weather').textContent = "Unable to determine city";
                 });
         }
 
