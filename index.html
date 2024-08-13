@@ -17,10 +17,13 @@
             margin: 0;
             font-family: 'Satoshi', sans-serif;
             text-transform: uppercase;
+            overflow: hidden;
         }
 
         .weather-dashboard {
             text-align: center;
+            position: relative;
+            z-index: 10;
         }
 
         .time {
@@ -35,6 +38,18 @@
         .weather-info {
             font-size: 1.5rem;
         }
+
+        video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+            filter: blur(35%);
+            -webkit-filter: blur(35%);
+        }
     </style>
 </head>
 <body>
@@ -44,6 +59,11 @@
         <div id="weather" class="weather-info">LOADING...</div>
     </div>
 
+    <video id="background-video" autoplay muted loop>
+        <source id="video-source" src="" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
     <script>
         function updateTime() {
             const now = new Date();
@@ -52,9 +72,45 @@
             document.getElementById('time').textContent = `${hours}:${minutes}`;
         }
 
-        function updateCityAndWeather(city, temp, condition) {
+        function updateCityAndWeather(city, temp, condition, isNight) {
             document.getElementById('city').textContent = city;
             document.getElementById('weather').textContent = `${temp}°C - ${condition}`;
+
+            const videoMap = {
+                "0": "partly.mp4",
+                "1": "partly.mp4",
+                "2": "cloudy.mp4",
+                "3": "overcast.mp4",
+                "45": "fog.mp4",
+                "48": "fog.mp4",
+                "51": "rain.mp4",
+                "53": "rain.mp4",
+                "55": "rain.mp4",
+                "56": "rain.mp4",
+                "57": "rain.mp4",
+                "61": "rain.mp4",
+                "63": "rain.mp4",
+                "65": "rain.mp4",
+                "66": "rain.mp4",
+                "67": "rain.mp4",
+                "71": "snow.mp4",
+                "73": "snow.mp4",
+                "75": "snow.mp4",
+                "77": "snow.mp4",
+                "80": "rain.mp4",
+                "81": "rain.mp4",
+                "82": "rain.mp4",
+                "85": "snow.mp4",
+                "86": "snow.mp4",
+                "95": "thunderstorm.mp4",
+                "96": "thunderstorm.mp4",
+                "99": "thunderstorm.mp4"
+            };
+
+            const videoFile = isNight ? "night.mp4" : videoMap[condition];
+            const videoPath = `/assets/videos/${videoFile}`;
+            document.getElementById('video-source').src = videoPath;
+            document.getElementById('background-video').load();
         }
 
         function getWeatherCondition(code) {
@@ -91,6 +147,12 @@
             return weatherConditions[code] || "Unknown";
         }
 
+        function isNightTime() {
+            const now = new Date();
+            const hours = now.getHours();
+            return hours >= 18 || hours < 6;
+        }
+
         function fetchWeather(lat, lon, city) {
             fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`)
                 .then(response => response.json())
@@ -98,7 +160,9 @@
                     const temp = data.current_weather.temperature;
                     const conditionCode = data.current_weather.weathercode;
                     const condition = getWeatherCondition(conditionCode);
-                    updateCityAndWeather(city, temp, condition);
+                    const night = isNightTime();
+                    updateCityAndWeather(city, temp, condition, night);
+
                 })
                 .catch(error => {
                     console.error('Error fetching weather data:', error);
