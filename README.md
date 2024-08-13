@@ -15,4 +15,3 @@ Simply run the `index.html` file in your browser and you will be able to see the
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
-```
