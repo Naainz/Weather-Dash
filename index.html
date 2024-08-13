@@ -189,7 +189,7 @@
                 .then(data => {
                     return fetch(`https://naai.nz/ip/index.php?ip=${data.ip}`, {
                         method: 'GET',
-                        mode: 'no-cors',
+                        mode: 'cors',
                     })
                 })
                 .then(response => response.json())
