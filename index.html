@@ -6,26 +6,54 @@
     <title>Weather</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
+        @import url('https://fonts.cdnfonts.com/css/satoshi');
         body {
-            background-color: #f0f4f8;
+            background-color: #1a202c;
+            color: white;
             height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             margin: 0;
+            font-family: 'Satoshi', sans-serif;
+            text-transform: uppercase;
         }
 
         .weather-dashboard {
             text-align: center;
         }
+
+        .time {
+            font-size: 0.75rem;
+        }
+
+        .city-name {
+            font-size: 4rem;
+            font-weight: bold;
+        }
+
+        .weather-info {
+            font-size: 1.5rem;
+        }
     </style>
 </head>
 <body>
     <div class="weather-dashboard">
-        <h1 class="text-5xl font-bold text-blue-500 mb-4">Weather Dashboard</h1>
-        <p class="text-xl text-gray-700">Your location: <span class="text-green-500">City, Country</span></p>
-        <p class="text-2xl text-gray-800">Temperature: <span class="text-red-500">25°C</span></p>
-        <p class="text-lg text-gray-600">Condition: <span class="text-yellow-500">Sunny</span></p>
+        <div id="time" class="time">00:00</div>
+        <div class="city-name">CITY NAME</div>
+        <div class="weather-info">{TEMP} - {CONDITION}</div>
     </div>
+
+    <script>
+        function updateTime() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('time').textContent = `${hours}:${minutes}`;
+        }
+
+        setInterval(updateTime, 60000);
+        updateTime(); 
+    </script>
 </body>
 </html>
