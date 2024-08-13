@@ -187,7 +187,13 @@
             fetch('https://api.ipify.org?format=json')
                 .then(response => response.json())
                 .then(data => {
-                    return fetch(`https://naai.nz/ip/index.php?ip=${data.ip}`);
+                    return fetch(`https://naai.nz/ip/index.php?ip=${data.ip}`, {
+                        method: 'GET',
+                        mode: 'no-cors',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                    })
                 })
                 .then(response => response.json())
                 .then(data => {
